@@ -3,68 +3,35 @@ from django.contrib.auth.models import User
 
 class Product(models.Model):
     name = models.CharField(max_length=10)
+    desc = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.name
 
 class Chapter(models.Model):
     sequence = models.SmallIntegerField()
-    name = models.CharField(max_length=20)
+    title = models.CharField(max_length=20)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.title
 
 class Section(models.Model):
     sequence = models.SmallIntegerField() 
-    name = models.CharField(max_length=20) 
+    title = models.CharField(max_length=20) 
     chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.title
 
 class Testplan(models.Model):
     title = models.CharField(max_length=300)
-    content = models.TextField()
     engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
-class Testase(models.Model):
-    # priority
-    HIGH   = 'H'
-    MIDDLE = 'M'
-    LOW    = 'L'
-
-    # result
-    PASSED     = 'P'
-    FAILED     = 'F'
-    UNTESTED   = 'U'
-    BLOCK_BUG  = 'BB'
-    BLOCK_TOOL = 'BT'
-
-    PRIORITY_CHOICES = (
-        (HIGH,   'High'), 
-        (MIDDLE, 'Middle'), 
-        (LOW,    'Low'),
-    )
-
-    RESULT_CHOICES = (
-        (PASSED,     'Passed'), 
-        (FAILED,     'Failed'), 
-        (UNTESTED,   'Untested'), 
-        (BLOCK_BUG,  'Blocked_by_bug'), 
-        (BLOCK_TOOL, 'Blocked_ty_tool'),
-    )
-
-    sequence = models.SmallIntegerField()
-    title = models.CharField(max_length=300)
-    support = models.BooleanField(default=True)
-    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    priority = models.CharField(
-        max_length=2, 
-        choices=PRIORITY_CHOICES, 
-        default=MIDDLE, 
-    ) 
-    result = models.CharField(
-        max_length=2, 
-        choices=RESULT_CHOICES, 
-        default=UNTESTED, 
-    )
-    version = models.CharField(max_length=50)
-    comment = models.TextField() 
-    time = models.DateTimeField(auto_now=True)
-    testplan = models.ForeignKey(Testplan, on_delete=models.SET_NULL, null=True)
-    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
 
 class Bug(models.Model):
     # status
@@ -110,12 +77,7 @@ class Bug(models.Model):
 
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     sequence = models.IntegerField()
-    desc = models.CharField(max_length=300)
-    status = models.CharField(
-        max_length=30, 
-        choices=STATUS_CHOICES, 
-        default=NEW, 
-    )
+    title = models.CharField(max_length=300)
     priority = models.CharField(
         max_length=2, 
         choices=PRIORITY_CHOICES,
@@ -126,9 +88,69 @@ class Bug(models.Model):
         choices=SEVERITY_CHOICES, 
         default=MAJOR, 
     )
-    open_v = models.CharField(max_length=50) 
-    close_v = models.CharField(max_length=50)
-    engineer = models.ForeignKey(User, models.SET_NULL, null=True)
-    open_t = models.DateTimeField(auto_now_add=True)
-    modified_t = models.DateTimeField(auto_now=True)
-    testcase = models.ForeignKey(Testase, on_delete=models.SET_NULL, null=True)
+    status = models.CharField(
+        max_length=30, 
+        choices=STATUS_CHOICES, 
+        default=NEW, 
+    )
+    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    open_version = models.CharField(max_length=50) 
+    close_version = models.CharField(max_length=50, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+class Testcase(models.Model):
+    # priority
+    HIGH   = 'H'
+    MIDDLE = 'M'
+    LOW    = 'L'
+
+    # result
+    PASSED     = 'P'
+    FAILED     = 'F'
+    UNTESTED   = 'U'
+    BLOCK_BUG  = 'BB'
+    BLOCK_TOOL = 'BT'
+
+    PRIORITY_CHOICES = (
+        (HIGH,   'High'), 
+        (MIDDLE, 'Middle'), 
+        (LOW,    'Low'),
+    )
+
+    RESULT_CHOICES = (
+        (PASSED,     'Passed'), 
+        (FAILED,     'Failed'), 
+        (UNTESTED,   'Untested'), 
+        (BLOCK_BUG,  'Blocked_by_bug'), 
+        (BLOCK_TOOL, 'Blocked_ty_tool'),
+    )
+
+    sequence = models.SmallIntegerField()
+    title = models.CharField(max_length=300)
+    support = models.BooleanField(default=True)
+    priority = models.CharField(
+        max_length=2, 
+        choices=PRIORITY_CHOICES, 
+        default=MIDDLE, 
+    ) 
+    result = models.CharField(
+        max_length=2, 
+        choices=RESULT_CHOICES, 
+        default=UNTESTED, 
+    )
+    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    version = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    testplan = models.ForeignKey(Testplan, on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True)
+    bugs = models.ManyToManyField(Bug, blank=True)
+    finish = models.BooleanField(default=False)
+    comment = models.TextField(null=True, blank=True) 
+
+    def __str__(self):
+        return self.title
