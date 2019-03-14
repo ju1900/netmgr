@@ -11,7 +11,7 @@ class Product(models.Model):
 class Chapter(models.Model):
     sequence = models.SmallIntegerField()
     title = models.CharField(max_length=20)
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, related_name='chapters', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
@@ -19,14 +19,14 @@ class Chapter(models.Model):
 class Section(models.Model):
     sequence = models.SmallIntegerField() 
     title = models.CharField(max_length=20) 
-    chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, null=True)
+    chapter = models.ForeignKey(Chapter, related_name='sections', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.title
 
 class Testplan(models.Model):
     title = models.CharField(max_length=300)
-    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    engineer = models.ForeignKey(User, related_name='testplans', on_delete=models.SET_NULL, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     
@@ -75,7 +75,7 @@ class Bug(models.Model):
         (ENHANCEMENT, 'Enhancement'), 
     )
 
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, related_name='bugs', on_delete=models.SET_NULL, null=True)
     sequence = models.IntegerField()
     title = models.CharField(max_length=300)
     priority = models.CharField(
@@ -93,7 +93,7 @@ class Bug(models.Model):
         choices=STATUS_CHOICES, 
         default=NEW, 
     )
-    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    engineer = models.ForeignKey(User, related_name='bugs', on_delete=models.SET_NULL, null=True)
     open_version = models.CharField(max_length=50) 
     close_version = models.CharField(max_length=50, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -142,13 +142,13 @@ class Testcase(models.Model):
         choices=RESULT_CHOICES, 
         default=UNTESTED, 
     )
-    engineer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    engineer = models.ForeignKey(User, related_name='testcases', on_delete=models.SET_NULL, null=True)
     version = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    testplan = models.ForeignKey(Testplan, on_delete=models.SET_NULL, null=True, blank=True)
-    section = models.ForeignKey(Section, on_delete=models.SET_NULL, null=True, blank=True)
-    bugs = models.ManyToManyField(Bug, blank=True)
+    testplan = models.ForeignKey(Testplan, related_name='testcases', on_delete=models.SET_NULL, null=True, blank=True)
+    section = models.ForeignKey(Section, related_name='testcases', on_delete=models.SET_NULL, null=True, blank=True)
+    bugs = models.ManyToManyField(Bug, related_name='testcases', blank=True)
     finish = models.BooleanField(default=False)
     comment = models.TextField(null=True, blank=True) 
 
