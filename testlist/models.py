@@ -35,10 +35,10 @@ class Testplan(models.Model):
 
 class Bug(models.Model):
     # status
-    NEW        = 'N'
-    VERI_FIXED = 'F' 
-    RESO_INVAL = 'I'
-    RESO_WONT  = 'W' 
+    NEW        = 'New'
+    VERI_FIXED = 'Verfied_fixed' 
+    RESO_INVAL = 'Resolved_invalid'
+    RESO_WONT  = 'Resolved_wontfix' 
 
     # priority
     P1 = 'P1'
@@ -48,10 +48,10 @@ class Bug(models.Model):
     P5 = 'P5'
 
     # severity
-    CRITICAL    = 'C'
-    MAJOR       = 'M'
-    NORMAL      = 'N' 
-    ENHANCEMENT = 'E'
+    CRITICAL    = 'Critical'
+    MAJOR       = 'Major'
+    NORMAL      = 'Normal' 
+    ENHANCEMENT = 'Enhancement'
 
     PRIORITY_CHOICES = (
         (P1, 'P1'), 
@@ -84,12 +84,12 @@ class Bug(models.Model):
         default=P2, 
     )
     severity = models.CharField(
-        max_length=15, 
+        max_length=20, 
         choices=SEVERITY_CHOICES, 
         default=MAJOR, 
     )
     status = models.CharField(
-        max_length=30, 
+        max_length=20, 
         choices=STATUS_CHOICES, 
         default=NEW, 
     )
@@ -104,16 +104,16 @@ class Bug(models.Model):
 
 class Testcase(models.Model):
     # priority
-    HIGH   = 'H'
-    MIDDLE = 'M'
-    LOW    = 'L'
+    HIGH   = 'High'
+    MIDDLE = 'Middle'
+    LOW    = 'Low'
 
     # result
-    PASSED     = 'P'
-    FAILED     = 'F'
-    UNTESTED   = 'U'
-    BLOCK_BUG  = 'BB'
-    BLOCK_TOOL = 'BT'
+    PASSED     = 'Passed'
+    FAILED     = 'Failed'
+    UNTESTED   = 'Untested'
+    BLOCK_BUG  = 'Blocked_by_bug'
+    BLOCK_TOOL = 'Blocked_by_tool'
 
     PRIORITY_CHOICES = (
         (HIGH,   'High'), 
@@ -126,19 +126,19 @@ class Testcase(models.Model):
         (FAILED,     'Failed'), 
         (UNTESTED,   'Untested'), 
         (BLOCK_BUG,  'Blocked_by_bug'), 
-        (BLOCK_TOOL, 'Blocked_ty_tool'),
+        (BLOCK_TOOL, 'Blocked_by_tool'),
     )
 
     sequence = models.SmallIntegerField()
     title = models.CharField(max_length=300)
     support = models.BooleanField(default=True)
     priority = models.CharField(
-        max_length=2, 
+        max_length=10, 
         choices=PRIORITY_CHOICES, 
         default=MIDDLE, 
     ) 
     result = models.CharField(
-        max_length=2, 
+        max_length=20, 
         choices=RESULT_CHOICES, 
         default=UNTESTED, 
     )

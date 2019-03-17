@@ -9,30 +9,47 @@
     <title>Document</title>
 </head>
 <body>
-    <div>
-        <tr>
-            <td><button type="button">New</button></td>
-        </tr>
-    </div>
+    {% verbatim %}
     <div id='testcase_list'>
-        [[ message ]]
+        <li v-for="(value, key, index) in initial_data">
+            {{ index }}
+        </li>
+        <span>
+            {{ type }}
+        </span>
     </div>
+    {% endverbatim %}
 </body>
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
 <script type="text/javascript" src='{% static "testcase.js" %}'></script>
 <script>
+    var initial_data = 'example';
+    var data1 = {
+        firstName: 'John',
+        lastName: 'Doe',
+        age: 30
+    }
     $(function() {
         // When we're using HTTPS, use WSS too.
         var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var chatsock = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testlist/testcase/");
+        var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testlist/testcase/");
+        
+        tescasesocket.onmessage = function(e) {
+            initial_data = JSON.parse(e.data);
+            console.log(initial_data);
+        };
     });
-    var testcase_list = 'example'
+    console.log(initial_data);
     var app = new Vue({
-        delimiters: ['[[', ']]'],
+        // delimiters: ['[[', ']]'],
         el: '#testcase_list', 
         data: {
-            message: testcase_list, 
+            type: 'testcase',
+            initial_data: data1, 
         }
     })
+    console.log(initial_data);
+
+
 </script>
 </html>

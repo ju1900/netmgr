@@ -1,6 +1,8 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 import json
+from .models import Testcase
+import collections
 
 class TestcaseConsumer(WebsocketConsumer): 
     def connect(self):
@@ -13,6 +15,31 @@ class TestcaseConsumer(WebsocketConsumer):
         )
 
         self.accept()
+
+        testcases = Testcase.objects.all()
+        initial_data = collections.OrderedDict()
+        for testcase in testcases:
+            bugs = {}
+            for bug in testcase.bugs.all():
+                bugs[bug.id] = {
+                    'sequence': bug.sequence, 
+                    'title': bug.sequence, 
+                }
+            initial_data[testcase.id] = {
+                'sequence': testcase.sequence,
+                'title': testcase.title,
+                'support': testcase.support, 
+                'priority': testcase.priority, 
+                'result': testcase.result, 
+                'engineer': testcase.engineer.username, 
+                'version': testcase.version, 
+                'testplan': testcase.testplan.title if testcase.testplan else None,
+                'section': testcase.section.title,
+                'bugs': bugs, 
+                'finish': testcase.finish, 
+                'comment': testcase.comment, 
+            }
+        self.send(text_data=json.dumps(initial_data))
 
     def disconnect(self, close_code):
         # Leave room group
