@@ -143,7 +143,7 @@ class Testcase(models.Model):
         default=UNTESTED, 
     )
     engineer = models.ForeignKey(User, related_name='testcases', on_delete=models.SET_NULL, null=True)
-    version = models.CharField(max_length=50)
+    version = models.CharField(max_length=50, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     testplan = models.ForeignKey(Testplan, related_name='testcases', on_delete=models.SET_NULL, null=True, blank=True)
