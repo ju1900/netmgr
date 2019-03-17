@@ -21,11 +21,17 @@
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
 <script type="text/javascript" src='{% static "testcase.js" %}'></script>
 <script>
+    $(function() {
+        // When we're using HTTPS, use WSS too.
+        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        var chatsock = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testlist/testcase/");
+    });
+    var testcase_list = 'example'
     var app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#testcase_list', 
         data: {
-            message: 'Hello Vue!'
+            message: testcase_list, 
         }
     })
 </script>
