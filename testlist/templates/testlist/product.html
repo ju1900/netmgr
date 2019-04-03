@@ -10,8 +10,8 @@
 </head>
 <body>
     <div id='testcase_list'>
-        <li>
-            [[testcase.sequence]] - [[  testcase.title ]]
+        <li v-for="(chater, index) in initial_data" :key='chater.id'>
+            <a v-bind:href="base + url + chater.id">[[chater.sequence]] - [[  chater.title ]]</a>
         </li>
     </div>
 </body>
@@ -20,19 +20,21 @@
 <script>
     var app = new Vue({
         delimiters: ['[[', ']]'],
-        el: '#testcase_list', 
+        el: '#testcase_list',
         data: {
-            testcase: {}, 
+            initial_data: [], 
+            base: '/testlist/',
+            url: 'chapter/c',
         }, 
-        created: function(){
+        created: function() {
             // When we're using HTTPS, use WSS too.
             var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testcase/" + {{ id }} + "/");
+            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/product/" + {{ id }} + "/");
             
             tescasesocket.onmessage = function(e) {
-                app.testcase = JSON.parse(e.data)
-            };
+                app.initial_data = JSON.parse(e.data); 
+            }
         }
-    });
+    })
 </script>
 </html>

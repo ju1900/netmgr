@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id='testcase_list'>
+        <div >
+            <button @click="newTestcase">New</button>
+            <button>Input</button>
+        </div>
+        <hr>
+        <label>Sequence: </label><input type="text" v-model="new_sequence">
+        <label>title: </label><input type="text" v-model="new_title">
+        <button type="button" v-on:click="submitTestcase">Submit</button>
+        <hr>
+        <li v-for="(testcase, index) in sortstestcase" :key="testcase.id">
+            <a v-bind:href="base + url + testcase.id">[[testcase.sequence]] - [[  testcase.title ]]</a>
+        </li>
+    </div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script type="text/javascript" src='{% static "testcase.js" %}'></script>
+<script>
+    var app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#testcase_list', 
+        data: {
+            initial_data: [], 
+            base: '/testlist/',
+            url: 'testcase/t',
+            new_sequence: '', 
+            new_title: '',
+        }, 
+        created: function() {
+            // When we're using HTTPS, use WSS too.
+            var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/section/" + {{ id }} + "/");
+            
+            tescasesocket.onmessage = function(e) {
+                app.initial_data = JSON.parse(e.data); 
+            }
+        }, 
+        computed:{
+            sortstestcase: function(){
+              return this.sortByKey(this.initial_data, 'sequence')
+            }
+        }, 
+        methods: {
+            sortByKey: function(array, key) {
+                return array.sort(function(a,b){
+                    var x = a[key];
+                    var y = b[key];
+                    return((x<y)?-1:((x>y)?1:0));
+                })
+            }, 
+            newTestcase: function(){
+                this.initial_data.push({
+                    id: 7, 
+                    sequence: 4, 
+                    title: 'testcaseadd'
+                })
+            },
+            submitTestcase: function(){
+                app.initial_data.push({
+                    id: 9, 
+                    sequence: app.new_sequence, 
+                    title: app.new_title
+                })
+            }
+        }
+    })
+</script>
+</html>

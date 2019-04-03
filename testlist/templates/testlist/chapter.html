@@ -10,8 +10,8 @@
 </head>
 <body>
     <div id='testcase_list'>
-        <li>
-            [[testcase.sequence]] - [[  testcase.title ]]
+        <li v-for="(section, index) in initial_data" :key='section.id'>
+            <a v-bind:href="base + url + section.id">[[section.sequence]] - [[  section.title ]]</a>
         </li>
     </div>
 </body>
@@ -22,17 +22,19 @@
         delimiters: ['[[', ']]'],
         el: '#testcase_list', 
         data: {
-            testcase: {}, 
+            initial_data: [], 
+            base: '/testlist/',
+            url: 'section/s',
         }, 
-        created: function(){
+        created: function() {
             // When we're using HTTPS, use WSS too.
             var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testcase/" + {{ id }} + "/");
+            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/chapter/" + {{ id }} + "/");
             
             tescasesocket.onmessage = function(e) {
-                app.testcase = JSON.parse(e.data)
-            };
+                app.initial_data = JSON.parse(e.data); 
+            }
         }
-    });
+    })
 </script>
 </html>

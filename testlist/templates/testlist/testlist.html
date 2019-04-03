@@ -10,9 +10,20 @@
 </head>
 <body>
     <div id='testcase_list'>
-        <li>
-            [[testcase.sequence]] - [[  testcase.title ]]
-        </li>
+        <table>
+            <thead>
+                <tr>
+                    <th>产品</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(product, index) in initial_data" :key='product.id'>
+                    <td><a v-bind:href="base + url + product.id">[[ product.name ]]</a></td>
+                    <td>[[ product.desc ]]</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
@@ -22,17 +33,20 @@
         delimiters: ['[[', ']]'],
         el: '#testcase_list', 
         data: {
-            testcase: {}, 
+            initial_data: [], 
+            base: '/testlist/',
+            url: 'product/p', 
         }, 
-        created: function(){
+        created: function() {
             // When we're using HTTPS, use WSS too.
             var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testcase/" + {{ id }} + "/");
+            var tescasesocket = new WebSocket(ws_scheme + '://' + window.location.host + "/ws/testlist/");
             
             tescasesocket.onmessage = function(e) {
-                app.testcase = JSON.parse(e.data)
-            };
+                app.initial_data = JSON.parse(e.data); 
+                console.log(app.initial_data)
+            }
         }
-    });
+    })
 </script>
 </html>

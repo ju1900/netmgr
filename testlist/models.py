@@ -27,6 +27,7 @@ class Section(models.Model):
 class Testplan(models.Model):
     title = models.CharField(max_length=300)
     engineer = models.ForeignKey(User, related_name='testplans', on_delete=models.SET_NULL, null=True)
+    procedure = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     
@@ -154,3 +155,29 @@ class Testcase(models.Model):
 
     def __str__(self):
         return self.title
+
+class Step(models.Model):
+    START_INIT_CHECK     = 'start_init_check'
+    START_CHECK_CLI      = 'start_check_cli'
+    START_CHECK_MIRROR   = 'start_check_mirror'
+    RUN                  = 'run'
+    CONF                  = 'conf'
+
+    STEP_CHOICES = (
+        (START_INIT_CHECK,     'start_init_check'), 
+        (START_CHECK_CLI,      'start_check_cli'), 
+        (START_CHECK_MIRROR,   'start_check_mirror'), 
+        (RUN,                  'run'), 
+        (CONF,                 'conf'),
+    )
+
+    testplan = models.ForeignKey(Testplan, related_name='steps', on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=STEP_CHOICES)
+    comment = models.CharField(max_length=200)
+    procedure = models.CharField(max_length=50)
+
+class SubStep(models.Model):
+    comment = models.CharField(max_length=200)
+    spanwn = models.CharField(max_length=20)
+    content = models.TextField()
+    step = models.ForeignKey(Step, related_name='Substeps', on_delete=models.CASCADE)
